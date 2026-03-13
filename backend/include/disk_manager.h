@@ -35,6 +35,15 @@ public:
 
     // Crea directorios necesarios para la ruta
     static bool createDirectories(const std::string& path);
+    
+    // Busca una partición por nombre
+    static int findPartitionByName(const std::string& path, const std::string& name);
+    
+    // Obtiene espacio libre en disco
+    static int getFreeSpace(const std::string& path, int diskSize);
+    
+    // Calcula donde colocar una partición (Best Fit, First Fit, Worst Fit)
+    static int calculatePartitionStart(const std::string& path, int size, char fit, int diskSize);
 };
 
 #endif // DISK_MANAGER_H
