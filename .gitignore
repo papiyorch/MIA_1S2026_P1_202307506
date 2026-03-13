@@ -1,0 +1,34 @@
+# Build artifacts
+/backend/build/
+/backend/bin/
+/backend/obj/
+*.o
+*.a
+*.so
+*.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Discos de prueba
+*.mia
+
+# Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Logs
+*.log
+
