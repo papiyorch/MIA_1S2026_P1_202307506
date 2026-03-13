@@ -13,6 +13,7 @@ private:
     std::string currentUser;
     std::string currentPartitionId;
     bool isLoggedIn;
+    std::map<std::string, std::string> mountedPartitions;  // ID -> ruta del disco
 
 public:
     CommandHandler();

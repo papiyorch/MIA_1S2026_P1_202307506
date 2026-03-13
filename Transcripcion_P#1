@@ -1,0 +1,672 @@
+1. Resumen Ejecutivo 
+
+El proyecto consiste en el desarrollo de una aplicación web multiplataforma llamada ExtreamFS, que permite simular y administrar un sistema de archivos basado en EXT2. La iniciativa busca abordar la dificultad de comprender e implementar estructuras internas de sistemas de archivos reales, como discos, particiones, inodos y permisos, desde un enfoque práctico. Para ello, se crea una solución que integra un backend en C++ y un frontend interactivo, permitiendo ejecutar comandos, gestionar usuarios, visualizar reportes estructurales y experimentar con funcionalidades clave de un sistema de archivos, todo de forma local y sin depender de hardware físico.
+
+2. Competencia que desarrollaremos 
+
+Implementa un sistema de archivos con estructuras ext2/ext3 expuesto mediante una API e interfaz gráfica mediante la integración de funciones del backend y visualización de resultados en el frontend para gestionar operaciones relacionadas a la construcción y manejo de un sistema de archivos.
+
+Integra soluciones de almacenamiento local y en la nube mediante la selección y combinación de tecnologías de almacenamiento físico y virtualizado para diseñar infraestructuras eficientes, seguras y escalables.
+
+Objetivos del Aprendizaje 
+
+3.1 Objetivo General 
+
+El estudiante será capaz de diseñar y desarrollar una aplicación web funcional que simule un sistema de archivos EXT2, permitiendo la creación y administración de discos, particiones, archivos y usuarios, mediante la integración de un frontend interactivo y un backend desarrollado en C++. A través de esta solución, aplicará conocimientos de estructuras de datos, teoría de archivos, diseño de sistemas, y generación de reportes técnicos, entregando un prototipo completo con su respectiva documentación técnica.
+
+3.2 Objetivos Específicos 
+
+Al finalizar el proyecto, los estudiantes deberán ser capaces de: 
+
+1. Desarrollar un sistema funcional que simule un sistema de archivos EXT2: Aplicar conocimientos de estructuras de archivos, teoría de particiones y programación en C++ para construir una aplicación web capaz de crear, montar y formatear discos virtuales, así como gestionar inodos, bloques, carpetas y archivos.
+
+*Ejemplo: Los estudiantes podrán ejecutar comandos desde la interfaz web para crear discos.mia, asignar particiones y generar estructuras internas del sistema EXT2.
+
+2.  Diseñar una interfaz web interactiva para la gestión de comandos y visualización de resultados: Implementar un frontend moderno que permita a los usuarios introducir comandos, visualizar salidas, y cargar scripts para simular operaciones reales sobre un sistema de archivos.
+* Ejemplo: Los estudiantes desarrollarán una página web con área de entrada y salida de comandos, y podrán ejecutar scripts .smia que interactúan con el backend.
+3.  Generar reportes visuales del sistema de archivos utilizando Graphviz: Representar gráficamente las estructuras internas del sistema como el MBR, inodos, bloques y árboles de directorios, facilitando la comprensión del funcionamiento del sistema de archivos.
+* Ejemplo: Los estudiantes podrán generar archivos visuales.jpg o .txt que muestren el estado actual de las estructuras internas del disco, usando comandos definidos como rep.
+
+4. Enunciado del Proyecto
+
+El Proyecto 1 tiene como objetivo desarrollar una aplicación web para la interacción y gestión de un sistema de archivos EXT2. Esta herramienta web moderna permitirá acceder y administrar el sistema de archivos desde cualquier lugar y en cualquier sistema operativo. En el backend, el sistema de archivos se gestionará en una distribución Linux, que atenderá todas las solicitudes provenientes del frontend. Dado que se trata del primer proyecto, la implementación se realizará de manera local.
+
+4.1 Descripción del problema a resolver 
+
+Arquitectura El proyecto tendrá la siguiente arquitectura: 
+
+Frontend: 
+
+Se recomienda emplear un framework moderno para el desarrollo del frontend; Angular es una opción destacada por su modularidad, robustez y gran comunidad de soporte. Sin embargo, el desarrollador puede elegir alternativas como React, Vue.js, u otros, según su preferencia y necesidades del proyecto.
+
+La función principal del frontend será gestionar la interfaz de usuario, proporcionando una experiencia dinámica e interactiva. Esta capa deberá contar con un manejo eficiente del estado de la aplicación y comunicación fluida con el backend a través de APIs.
+
+Backend: 
+
+ El desarrollo del backend debe realizarse obligatoriamente en C++, un lenguaje destacado por su rendimiento, capacidad de manejo de concurrencia y eficiencia, lo cual lo convierte en una opción ideal para crear aplicaciones sólidas y escalables.La responsabilidad principal del backend será exponer APIs RESTful para facilitar la comunicación con el frontend.
+
+La arquitectura del backend debe estructurarse siguiendo principios de diseño limpio y una adecuada separación de responsabilidades, asegurando un código bien organizado y fácil de mantener.
+
+Primer Parte (Frontend) 
+
+Para este apartado, se requiere un frontend con una página de inicio que incluya los siguientes elementos: 
+
+-Área de Entrada de Comandos: En este espacio, el usuario puede introducir manualmente los comandos a ejecutar o cargar un archivo de script que contenga los comandos.
+
+-Botón de Carga de Archivo: Permite seleccionar un archivo de script para cargar rápidamente los comandos en el área de entrada, facilitando su ejecución.
+
+-Botón de Ejecutar: Inicia la ejecución de todos los comandos en el área de entrada y muestra los mensajes generados por el servidor en el área de salida
+
+-Área de Salida de Comandos: Aquí se muestran los resultados de los comandos ejecutados, procesados y enviados de vuelta desde el backend.
+
+Segunda Parte (Backend) 
+
+En el backend, se implementará un sistema de archivos EXT2. Para ello, la gestión de discos se simulará mediante archivos binarios con extensión .mia, en lugar de emplear dispositivos de almacenamiento físico. Estos archivos .mia almacenarán diversas estructuras que replicarán el funcionamiento del sistema de archivos, permitiendo la administración de múltiples particiones y simulando el comportamiento de un entorno de almacenamiento EXT2.
+
+Discos 
+
+Se presenta la siguiente figura para mostrar de manera gráfica cómo es la escritura de las diferentes estructuras para entender el funcionamiento y la simulación del disco.
+
+
+
+La creación y detalles del mismo estarán especificadas más adelante en los respectivos comandos, pero se aclara que al crear un disco deberá estar llenado con ceros binarios para representar que es espacio disponible.
+
+Observaciones: 
+
+El tamaño del archivo NO deberá cambiar de tamaño una vez creado y designado un almacenamiento definido.
+
+Para crear el archivo del disco se recomienda utilizar un char[1024] como buffer para crear el archivo, si se utiliza un char[1] normalmente se tarda demasiado al momento de crear el archivo.
+
+Estructura para discos 
+
+Master Boot Record (MBR) 
+
+Cuando se crea un nuevo disco este debe contener un MBR ya que provee información del sistema de archivos y de las particiones, este deberá estar en el primer sector del disco. Tendrá los siguientes valores: 
+
+Nombre			Tipo	Descripción
+mbr_tamano		int	Tamaño total del disco en bytes
+mbr_fecha_creacion	time	Fecha y hora de creación del disco
+mbr_dsk_signature	int	Número random, que identifica de forma única a cada disco
+dsk_fit			char	Tipo de ajuste de la partición. Tendrá los valores B (Best), F (First) o W (worst)
+mbr_partitions		partition[4]	Estructura con información de las 4 particiones
+
+El MBR se crea en el primer sector del disco, es decir se escribirá al inicio de dicho disco conteniendo la información del sistema de archivos.
+
+Partition 
+
+Una partición es una división lógica de un disco que los sistemas de archivos tratan como una unidad separada. Tendrá los siguientes valores:
+
+Nombre		Tipo		Descripción
+part_status	char		Indica si la partición está montada o no
+part_type	char		Indica el tipo de partición, primaria o extendida. Tendrá los valores P o E
+part_fit	char		Tipo de ajuste de la partición. Tendrá los valores B (Best), F (First) o W (worst)
+part_start	int		Indica en qué byte del disco inicia la partición
+part_s		int		Contiene el tamaño total de la partición en bytes
+part_name	char[16]	Nombre de la partición
+part_correlative	int	Indica el correlativo de la partición este valor será inicialmente -1 hasta que sea montado (luego la primera partición montada empezará en 1 e irán incrementando)
+part_id	char[4]	Indica el ID de la partición generada al montar esta partición
+
+-Particiones Primarias: una partición primaria puede ser usada para iniciar un sistema operativo y contener distintos archivos no relacionados directamente con el sistema operativo.
+
+-Particiones Extendidas: una partición extendida es usada para contener unidades lógicas, estas particiones son manejadas por un EBR, al crear esta partición se creará el primer EBR.
+
+-Unidades Lógicas: estas unidades contienen archivos no relacionados con el sistema operativo, como podrían ser datos, audio, video y entre otros. Estas unidades lógicas son manejadas por un EBR.
+
+Al escribir una partición primaria se reservará dicho espacio para escribir otras estructuras dentro de dicho espacio para simular el funcionamiento de la partición, se aclara que el objeto partición sólo se actualizará en el MBR.
+
+Observaciones: 
+
+El manejo de archivos se utilizará a nivel de particiones primarias.
+
+Las particiones lógicas se utilizaran para el comando mount y reportes.
+
+Extended Boot Record (EBR) 
+
+El EBR es un descriptor de una unidad lógica ya que es contiene la información y datos de la misma y apunta hacia el espació donde se escribirá el siguiente EBR, el EBR se puede ver como una clase de lista enlazada. Tendrá los siguientes valores: 
+
+Nombre		Tipo	Descripción
+part_mount	char	Indica si la partición está montada o no
+part_fit	char	Tipo de ajuste de la partición. Tendrá los valores B (Best), F (First) o W (worst)
+part_start	int	Indica en qué byte del disco inicia la partición
+part_s		int	Contiene el tamaño total de la partición en bytes
+part_next	int	Byte en el que está el próximo EBR. -1 si no hay siguiente
+part_name	char[16]	Nombre de la partición
+
+Sistema de Archivos Ext2 
+
+EXT2 Para el caso del sistema de archivos EXT2, se deberán implementar las estructuras como se especifican a continuación. La estructura en bloques es la siguiente: 
+
+Superbloque 
+
+Bitmap Inodos 
+
+Bitmap Bloques 
+
+Inodos 
+
+Bloques 
+
+El número de bloques será el triple que el número de inodos. El número de inodos y bloques a crear se puede calcular despejando n de la primera ecuación y aplicando la función floor al resultado:
+
+tamaño_particion=sizeOf(superblock)+n+3∗n+n∗sizeOf(inodos)+3∗n∗sizeOf(block)
+numero_estructuras=floor(n)
+
+Observaciones
+
+sizeof es el tamaño de los Structs.
+
+En el Bitmap de Bloques y Bloques se multiplica por tres debido a que existen tres tipos de bloque que son: bloques carpetas, bloques archivos y bloques de contenido.
+
+Estructuras para carpetas y archivos 
+
+Súper Bloque 
+
+Esta estructura contiene la información sobre el sistema de archivos al que pertenece (en este caso EXT2), de esta estructura solo se escribe 1 vez en la partición según el espacio designado. Tendrá los siguientes valores:
+
+NOMBRE			TIPO	DESCRIPCIÓN
+s_filesystem_type	int	Guarda el número que identifica el sistema de archivos utilizado (2)
+s_inodes_count		int	Guarda el número total de inodos
+s_blocks_count		int	Guarda el número total de bloques
+s_free_blocks_count	int	Contiene el número de bloques libres
+s_free_inodes_count	int	Contiene el número de inodos libres
+s_mtime			time	Última fecha en el que el sistema fue montado
+s_umtime		time	Última fecha en que el sistema fue desmontado
+s_mnt_count		int	Indica cuantas veces se ha montado el sistema
+s_magic			int	Valor que identifica al sistema de archivos, tendrá el valor 0xEF53
+s_inode_s		int	Tamaño del inodo
+s_block_s		int	Tamaño del bloque
+s_firts_ino		int	Primer inodo libre (dirección del inodo)
+s_first_blo		int	Primer bloque libre (dirección del bloque)
+s_bm_inode_start	int	Guardará el inicio del bitmap de inodos
+s_bm_block_start	int	Guardará el inicio del bitmap de bloques
+s_inode_start		int	Guardará el inicio de la tabla de inodos
+s_block_start		int	Guardará el inicio de la tabla de bloques
+
+Es similar al MBR solo que se enfoca en las particiones, guarda las posiciones de la partición para permitir movimiento en ella. Esta información no cambia de tamaño y se debe actualizar, según se vayan realizando las operaciones en el sistema de archivos. Por ejemplo, al usar un comando, debe actualizar los valores que puedan ser modificados según corresponda.
+
+Inodos (index node) 
+
+Esta estructura contiene las características e información sobre un fichero usado por una carpeta o archivo. Tendrá los siguientes valores: 
+
+NOMBRE		ΤΙΡΟ	DESCRIPCIÓN
+i_uid		int	UID del usuario propietario del archivo o carpeta
+i_gid		int	GID del grupo al que pertenece el archivo o carpeta.
+i_s		int	Tamaño del archivo en bytes
+i_atime		time	Última fecha en que se leyó el inodo sin modificarlo
+i_ctime		time	Fecha en la que se creó el inodo
+i_mtime		time	Última fecha en la que se modifica el inodo
+i_block		int[15]	Array en los que los primeros 12 son bloques directos. El 13 será simple        		 indirecto, 14 doble indirecto y 15 triple indirecto. Valor -1 si no se usa.
+i_type		char	Indica si es archivo o carpeta. 1 = Archivo, 0 = Carpeta
+i_perm		char[3]	Permisos del archivo o carpeta en formato octal UGO.
+
+Observaciones: 
+
+1.El inodo guarda la información del archivo o carpeta, por cada archivo o carpeta debe existir un inodo.
+2.Se debe iniciar del inodo hasta el bloque.
+3.Este tendrá la información necesaria para el manejo de permisos a partir del usuario que creó el documento.
+4.Contiene el tipo de bloque 1 o 0.
+5.  Si es un inodo carpeta puede apuntar en sus apuntadores directos otros bloques carpeta o un inodo si es un archivo.
+6.  Si es un inodo archivo puede apuntar en sus apuntadores directos un bloque de datos para expandir la capacidad del archivo.
+
+Bloques 
+
+Estas estructuras son la unidad mínima de almacenamiento a nivel lógico. Estos bloques son un conjunto de sectores contiguos que componen la unidad de almacenamiento más pequeña de un disco, para este proyecto de procuró que todos los bloques tengan un tamaño de 64 bytes y los distintos bloques son: 
+
+Bloques de carpetas Esta estructura guardará la información sobre el nombre de de los archivos que contiene y a que Inodo apuntan. Tendrá los siguientes valores:
+
+NOMBRE		ΤΙΡΟ	DESCRIPCIÓN
+b_content	content[4]	Array con el contenido de la carpeta
+
+La estructura b_content tendrá los siguientes valores:
+
+NOMBRE	ΤΙΡΟ	 DESCRIPCIÓN
+b_name	char[12] Nombre de la carpeta o archivo
+b_inodo	int	 Apuntador hacia un inodo asociado al archivo o carpeta
+
+En cada inodo de carpeta, en el primer apuntador directo, en los primeros dos registros se guardará el nombre de la carpeta y su padre. Tamaño en bytes: 4 (estructuras b_content) * (12 chars + 4 int) = 64.
+
+Observaciones: 
+1. El bloque carpeta puede guardar otras carpetas u otros archivos.
+
+Bloques de Archivos 
+Esta estructura guardará la información sobre contenido de un archivo. Tendrá los siguientes valores: 
+
+NOMBRE		ΤΙΡΟ	DESCRIPCIÓN
+b_content	char[64]	Array con el contenido del archivo	
+
+Tamaño en bytes: 64 (chars b_content).
+
+Observaciones: 
+
+1.El bloque archivo guarda el contenido del archivo (64 caracteres).
+
+Bloques de Apuntadores 
+
+Esta estructura guardará la información de los apuntadores indirectos (simples, dobles y triples). Tendrá los siguientes valores: 
+
+NOMBRE		ΤΙΡΟ	DESCRIPCIÓN
+b_pointers	int[16]	Array con los apuntadores a bloques (de archivo o carpeta)
+
+Tamaño en bytes: 16 (cantidad de int) * 4 (int) = 64
+
+Observaciones: 
+
+Recordar que estos se usan con Inodos de tipo File (archivos).
+
+Bloque de apuntadores tiene 16 Posiciones.
+
+Bloque Simple Indirecto: Inodo → Bloque apuntadores → bloque de datos.
+
+Bloque Doble Indirecto: Inodo → Bloque de apuntadores → Bloque de apuntadores → bloque de datos.
+
+Bloque Triple Indirecto: Inodo → Bloque de apuntadores → Bloque de apuntadores → Bloque de apuntadores → bloque de datos.
+
+Limitaciones de estructuras 
+La cantidad de estructuras máximas a generar serán detalladas más adelante, pero se aclara que se debe realizar mediante un cálculo basado en el tipo de sistema en este proyecto solo será EXT2 y el tamaño del disco.
+
+Bitmap 
+
+Un Bitmap como su nombre lo indica es un mapa de bits, es decir es la representación binaria en la cual un bit o conjunto de bits corresponde a alguna parte de un objeto específico.
+
+Bitmap Inodos: indica el estado de los inodos, usando 0 como usable y 1 como ocupado.
+
+Bitmap bloques: indica el estado de los bloques (independientemente el tipo de bloque), usando 0 como usable y 1 como ocupado.
+
+Ejemplo: Si en el cálculo de estructuras resultó en tener 10 Inodos y 20 bloques, entonces tendremos 10 bits en el bitmap de inodos y 20 bits en el bitmap de bloques, donde la creación de un inodo supondrá el cambió de un bit según si correlativo en el bitmap de inodos y de la misma manera con el bitmap de bloques, estos bitmaps son cambiados en el espacio designado como en los ejemplos de las figuras anteriores.
+
+Comandos del sistema de archivos 
+
+La aplicación web contará con dos áreas de texto. La primera se utilizará para la introducción de comandos o la carga de scripts, mientras que la segunda mostrará la salida resultante de la ejecución. La aplicación no distinguirá entre mayúsculas y minúsculas en los comandos ingresados. Se han definido parámetros obligatorios y opcionales para los comandos. Si se utiliza un parámetro que no está especificado en la documentación proporcionada, se mostrará un mensaje de error indicando que el parámetro no es reconocido. Los parámetros deben estar separados por espacios en blanco. Si un valor contiene espacios en blanco, deberá ser encerrado entre comillas dobles ("X"). La aplicación sólo reconocerá los comandos y parámetros definidos en el presente enunciado. No se aceptarán variaciones ni versiones de semestres anteriores. Los parámetros de todos los comandos pueden ser ingresados en cualquier orden.
+
+Administración de discos 
+
+Estos comandos están diseñados para crear archivos que simularán discos duros virtuales. Estos archivos virtuales podrán ser formateados posteriormente con los sistemas de archivos EXT2, permitiendo la simulación de operaciones típicas en un entorno de disco duro real. Desde el momento en que se inicie la aplicación, los usuarios tendrán acceso a estos comandos, que estarán disponibles para facilitar la gestión de los discos virtuales. La creación y manipulación de estos discos virtuales proporcionará una forma práctica de experimentar con sistemas de archivos y operaciones relacionadas sin necesidad de hardware físico adicional.
+
+A continuación se detallan los comandos disponibles: 
+
+1. MKDISK
+
+Este comando creará un archivo binario que simulará un disco, estos archivos binarios tendrán la extensión mia y su contenido al inicio será 0 binarios. Deberá ocupar físicamente el tamaño indicado por los parámetros. Recibirá el nombre del archivo que simulará el disco duro y tendrá los siguientes parámetros: 
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-size		Obligatorio	Número positivo mayor que cero que indica el tamaño del disco.
+-fit		Opcional	Ajuste para particiones: BF (Best Fit), FF (First Fit), WF (Worst Fit). Por defecto FF.
+-unit		Opcional	Unidades de size: K (Kilobytes), M (Megabytes).
+-path		Obligatorio	Ruta donde se creará el archivo. Si las carpetas no existen, deben crearse.
+
+Ejemplos: 
+
+mkdisk -Size=300 -unit=K -path=/home/user/Disco1.mia 
+
+mkdisk -path=/home/user/Disco2.mia -Unit=K -size=300 
+
+mkdisk -size=5 -unit=M -path="/home/mis discos/Disco3.mia" 
+
+mkdisk -size=10 -path="/home/mis discos/Disco5.mia" 
+
+2. RMDISK 
+
+Este parámetro elimina un archivo que representa a un disco duro. Tendrá los siguientes parámetros: 
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-path		Obligatorio	Ruta del archivo a eliminar. Si no existe, mostrar error.
+
+Ejemplo: 
+rmdisk -path="/home/mis discos/Disco4.mia"
+
+3. 
+FDISK 
+
+Este comando se encarga de la administración de particiones en el archivo que representa al disco duro virtual. Permite a los usuarios crear, eliminar o modificar particiones dentro del archivo de disco duro. En caso de que no se pueda realizar la operación, la aplicación deberá mostrar un mensaje de error detallado (falta de espacio, máximo de particiones, etc.). Tendrá los siguientes parámetros: 
+
+Parámetro	Categoría	Descripción
+-size	Obligatorio al crear	Número positivo que indica el tamaño de la partición.
+-unit	Opcional	Unidades: B (Bytes), K (Kilobytes), M (Megabytes). Por defecto K.
+-path	Obligatorio	Ruta del disco donde se creará la partición. El archivo debe existir.
+-type	Opcional	P (Primaria), E (Extendida), L (Lógica). Por defecto Primaria.
+-fit	Opcional	BF (Best), FF (First), WF (Worst). Por defecto WF.
+-name	Obligatorio	Nombre de la partición. No debe repetirse en el disco.
+
+Ejemplos: 
+
+fdisk -Size=300 -path=/home/Disco1.mia -name Particion1 
+
+fdisk -type=E -path=/home/Disco2.mia -Unit=K -name=Particion2 -size=300 
+
+fdisk -size=1 -type=L -unit=M -fit=BF -path="/mis discos/Disco3.mia" -name="Particion3" 
+
+fdisk -type=E -path=/home/Disco2.dk -name=Part3 -Unit=K -size=200 (Debería dar error si ya existe una extendida)
+
+4. MOUNT 
+
+Este comando montará una partición del disco en el sistema. Cada partición se identificará por un id con la estructura: Últimos dos dígitos del Carnet + Número de Partición + Letra.
+Ejemplo carnet 202401234: Ids = 341A, 341B, 342A, etc.
+
+Validaciones al montar: 
+
+    Si es del mismo disco, se incrementa el número de partición.
+
+Si es otro disco, se usa la siguiente letra (A, B, C...) y se reinicia el número a 1.
+
+El orden se define según se van montando.
+
+Observaciones: 
+
+    Montaje solo en memoria RAM, no escribe en el disco.
+
+Debe actualizar el estatus, correlativo e ID de la estructura de partición.
+
+Solo se trabajarán montajes con particiones primarias.
+
+El número de partición inicia en 1.
+
+Los parámetros admitidos son: 
+
+PARAMETRO	CATEGORÍA	DESCRIPCIÓN
+-path	Obligatorio	Ruta del disco a montar. Debe existir.
+-name	Obligatorio	Nombre de la partición. Si no existe, mostrar error.
+
+Ejemplos: Carnet = 202401234 
+
+mount -path=/home/Disco2.mia -name Part2 # id=341A 
+
+mount -path=/home/Disco2.mia -name Part1 # id=342A 
+
+mount -path=/home/Disco1.mia -name Part3 # id=341B 
+
+mount -path=/home/Disco3.mia -name Part2 # id=341C
+
+ 
+5.MOUNTED 
+
+Este comando mostrará todas las particiones montadas en memoria, obligatoriamente con el id de la partición. No cuenta con parámetros.
+
+Ejemplos: 
+
+    mounted # Por ejemplo: 341A, 342A, 341B, 341C
+    
+Administración del Sistema de Archivos 
+
+Simulan formateo, administración de usuarios, carpetas y archivos. Excepto MKFS y LOGIN, todos requieren una sesión activa; de lo contrario, mostrar error.
+
+6. MKFS 
+
+Formateo completo de la partición como ext2. Crea el archivo users.txt en la raíz con usuarios y contraseñas.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-id	Obligatorio	ID generado con mount.
+-type	Opcional	Full (formateo completo). Por defecto es Full.
+
+Ejemplos: 
+
+    mkfs -type=full -id=341A 
+
+mkfs -id=342A 
+
+Observaciones: Este comando agrega las estructuras requeridas en el disco.
+
+7. CAT 
+
+Muestra el contenido del archivo si el usuario logueado tiene permiso de lectura.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-fileN		Obligatorio	Lista de N ficheros a enlazar en el orden especificado. Error si no existe o no hay permiso.
+
+Ejemplos: 
+
+    cat -file1=/home/user/docs/a.txt 
+
+cat -file1="/home/a.txt" -file2="/home/b.txt" -file3="/home/c.txt" 
+
+Administración de Usuarios y Grupos 
+
+Archivo users.txt en la raíz de cada partición ext2. Registros para grupos y usuarios. ID 0 significa eliminado. Los IDs aumentan progresivamente.
+Estructura: 
+
+GID, Tipo, Grupo \n 
+
+UID, Tipo, Grupo, Usuario, Contraseña \n
+
+Estado y tipo ocupan una letra; grupo, usuario y contraseña máximo 10 letras. Al inicio existirá el grupo root, usuario root y contraseña 123.
+Contenido inicial de users.txt: 
+
+1, G, root \n 
+
+1, U, root, root, 123 \n 
+
+Al crear el archivo se asignan al usuario root.
+
+8. LOGIN 
+
+Inicia sesión. No se puede iniciar otra sin hacer LOGOUT.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-user	Obligatorio	Nombre de usuario (distingue mayúsculas/minúsculas).
+-pass	Obligatorio	Contraseña (distingue mayúsculas/minúsculas).
+-id	Obligatorio	ID de la partición montada. Las acciones se realizarán sobre este ID.
+
+Ejemplos: 
+
+    login -user=root -pass=123 -id=062A 
+
+login -user="mi usuario" -pass="mi pwd" -id=062A (Error si ya hay sesión) 
+
+9. LOGOUT 
+
+Cierra sesión activa. No recibe parámetros.
+
+Ejemplos: 
+
+    logout 
+
+Observaciones: Los siguientes comandos requieren sesión iniciada.
+
+10. 
+MKGRP 
+
+Crea un grupo en users.txt. Solo para usuario root. Error si ya existe. Distingue mayúsculas/minúsculas.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-name		Obligatorio	Nombre del grupo.
+
+Ejemplos: 
+
+    mkgrp -name=usuarios users.txt quedaría: 1, G, root \n 1, U, root, root, 123 \n 2, G, usuarios \n 
+
+11. RMGRP 
+
+Elimina un grupo (ID a 0). Solo para usuario root.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-name		Obligatorio	Nombre del grupo a eliminar. Error si no existe.
+
+Ejemplo: 
+
+rmgrp -name=usuarios users.txt quedaría: 1, G, root \n 1, U, root, root, 123 \n 0, G, usuarios \n
+
+12. MKUSR 
+
+Crea un usuario. Solo para root.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-user		Obligatorio	Nombre (máx 10 caracteres). Error si existe.
+-pass		Obligatorio	Contraseña (máx 10 caracteres).
+-grp		Obligatorio	Grupo al que pertenece. Debe existir en la partición.
+
+13. RMUSR 
+
+Elimina un usuario (ID a 0). Solo para root.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-user		Obligatorio	Nombre del usuario a eliminar. Error si no existe.
+
+		
+
+Ejemplo: 
+
+    rmusr -user=user1
+    
+Archivos users.txt quedaría: 
+1, G, root \n 
+1, U, root, root, 123 \n 2, 
+G, usuarios \n 
+0, U, usuarios, user1, usuario \n
+
+14. CHGRP 
+
+Cambia el grupo de un usuario. Solo para root.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-user		Obligatorio	Nombre del usuario.
+-grp		Obligatorio	Nuevo grupo. Error si no existe o está eliminado.
+
+#Cambia el grupo de user2
+chgro -user=user2
+-grp=grupo1
+
+#Crea usuario user1 en el grupo usuarios
+mskur -user=user1 -pass=usuario -grp=usuarios
+
+El archivo users.txt debería quedar:
+
+1,G, root\n
+1,U, root,root,123 \n
+2,G, usuarios \n
+2,U, usuarios,user1,usuario\n
+
+USUARIO ROOT 
+Usuario especial con permisos 777 sobre todo. Puede realizar cualquier operación. Los permisos se cambian con chmod (Proyecto 2). Categorías: User (Propietario), Grupo, Otros. Linux File Permission Cheatsheet.
+
+Administración de Carpetas Archivos y Permisos 
+
+Comandos para crear, editar, copiar, mover y eliminar archivos/carpetas con permisos UGO tipo Linux.
+
+15. MKFILE 
+
+Crea un archivo. Propietario: usuario actual. Permisos 664
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-path		Obligatorio	Ruta del archivo. Preguntar si se sobrescribe si ya existe.
+-r		Opcional	Crea carpetas padre si no existen. Sin valor asociado.
+-size		Opcional	Tamaño en bytes. Contenido: números 0-9. Defecto 0.
+-cont		Opcional	Ruta de un archivo en la PC local para cargar contenido.
+
+Observaciones: Prioridad de -cont sobre -size.
+
+Ejemplos: 
+
+    mkfile -size=15 -path=/home/user/docs/a.txt -r 
+
+mkfile path="/home/mis documentos/archivo 1.txt" 
+
+mkfile path=/home/user/docs/b.txt -r -cont=/home/documents/b.txt
+
+16. MKDIR 
+
+Crea carpetas. Propietario: usuario actual. Permisos 664.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-path		Obligatorio	Ruta de la carpeta.
+-p		Opcional	Crea carpetas padre si no existen.
+
+		
+
+Ejemplos: 
+
+    mkdir -p -path=/home/user/docs/usac 
+
+mkdir -path="/home/mis documentos/archivos clases"
+
+Script 
+
+Archivos con extensión .smia para carga masiva de comandos. Comentarios con # en una sola línea. Líneas en blanco preservadas.
+
+Reportes 
+
+Generados con comando rep usando Graphviz.
+
+1. REP 
+
+Genera reportes técnicos.
+
+PARÁMETRO	CATEGORÍA	DESCRIPCIÓN
+-name		Obligatorio	mbr, disk, inode, block, bm_inode, bm_block, tree, sb, file, ls.
+-path		Obligatorio	Carpeta y nombre del archivo de salida.
+-id		Obligatorio	ID de la partición.
+-path_file_ls	Opcional	Ruta del archivo/carpeta para reportes file o ls.
+
+		
+
+Reporte MBR: Tablas con info de MBR y EBRs. 
+Ejemplo: rep -id=A118 -path=/home/user/reports/reporte1.jpg -name=mbr.
+Muestra datos como mbr_tamano, mbr_fecha_creacion, part_status, part_type, part_start, part_size, etc.
+
+Reporte DISK: Estructura de particiones, MBR y porcentajes de espacio (total 100%). 
+Ejemplo: rep -id=A118 -path=/home/user/reports/report2.pdf -name=disk.
+
+Reporte Inode: Bloques con info de inodos utilizados.
+Ejemplo: rep -id=A118 -path/home/user/reports/report3.jpg
+-name=inode
+
+Reporte Block: Información de bloques utilizados (Carpetas, Archivos, Apuntadores).
+Ejemplo: rep -id=A118 -path/home/user/reports/report4.jpg
+-name=block
+
+Reporte bm_inode: Bitmap de inodos, 20 registros por línea en archivo .txt.
+Ejemplo: rep -id=A118 -path/home/user/reports/report5.jpg
+-name=bm_inode
+Muestra cadenas de 0s y 1
+
+Reporte bm_block: Bitmap de bloques, 20 registros por línea en .txt. 
+Ejemplo: rep -id=A118 -path=/home/user/reports/report6.txt -name=bm_block
+
+Reporte Tree: Muestra un grafo de árbol con inodos y bloques conectados. 
+Ejemplo: rep -id=A118 -path=/home/user/reports/report7.jpg -name=tree.
+
+Reporte Sb: Tabla con toda la información del superbloque.
+Muestra tabla con campos: sb_nombre_hd, sb_inodos_count, sb_bloques_count, sb_magic_num, etc.
+
+Reporte File: Nombre y contenido del archivo. 
+Ejemplo: rep -id=A118 -path=/home/user/reports/report9.txt -path_file_ls=/home/a.txt -name=file.
+
+Reporte Ls: Info de archivos/carpetas: permisos, owner, grupo, size, fechas, tipo, name. 
+Ejemplo: rep -id=A118 -path=/home/user/reports/report10.jpg -path_file_ls=/ -name=ls.
+
+Permisos	Owner	Grupo		Size	Fecha		Hora	Tipo	Name
+-rw-rw-r--	User1	Mi grupo	40661	24/02/2019	9:53	Archivo	Ejemplo.txt
+-rw-r--rwx	User2	Otro grupo	123	28/08/2019	8:13	Carpeta	Home
+
+Calificación 
+
+Los reportes evidencian funcionalidades por lo que son de suma importancia: 
+
+mkdisk/fdisk: reportes mbr y disk.
+
+mount: comando mounted.
+
+mkfs: reportes bm_inode, bm_block, inode, block (o tree).
+
+mkgrp/rmgrp/mkusr/rmusr/chgrp: comando cat o reporte file.
+
+mkfile/mkdir: reporte tree.
+
+Documentación 
+
+Manual Técnico con: Arquitectura, Estructuras de Datos (MBR, EBR, inodos, bloques), Comandos Implementados con ejemplos .
+
+Consideraciones 
+
+Proyecto individual. Detección de copias (nota 0). Backend obligatorio en C++. Calificación sobre GNU/Linux o MacOS físico. Discos no deben crecer. No estructuras en memoria para archivos.
+
+4.2 Alcance del proyecto 
+
+Obligatorio: App web ejecución comandos, backend C++, frontend entrada/salida y carga scripts, comandos básicos, documentación técnica .
+Opcional: Exportar reportes descargables.
+
+4.3 Requerimientos técnicos 
+
+Backend C++, Frontend Angular/React/Vue, Graphviz . Ejecución local GNU/Linux, archivos .mia como discos.
+
+4.4 Entregables 
+
+Sitio Web funcional, Comandos, Funcionalidades de Reportes, Scripts .smia, Documentación Técnica, Repo GitHub, Manual de Usuario, Diagrama de Flujo, Informe de Impacto, Plan de Mantenimiento.

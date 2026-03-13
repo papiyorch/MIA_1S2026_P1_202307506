@@ -174,3 +174,89 @@ bool DiskManager::createDirectories(const std::string& path) {
         return false;
     }
 }
+
+int DiskManager::findPartitionByName(const std::string& path, const std::string& name) {
+    MBR mbr;
+    if (!readMBR(path, mbr)) {
+        return -1;  // Error al leer
+    }
+    
+    for (int i = 0; i < 4; i++) {
+        if (std::string(mbr.mbr_partitions[i].part_name) == name && mbr.mbr_partitions[i].part_type != 'N') {
+            return i;  // Encontrada en posición i del MBR
+        }
+    }
+    return -1;  // No encontrada
+}
+
+int DiskManager::getFreeSpace(const std::string& path, int diskSize) {
+    MBR mbr;
+    if (!readMBR(path, mbr)) {
+        return -1;
+    }
+    
+    int usedSpace = sizeof(MBR);  // El MBR ocupa espacio
+    
+    for (int i = 0; i < 4; i++) {
+        if (mbr.mbr_partitions[i].part_type != 'N') {
+            usedSpace += mbr.mbr_partitions[i].part_s;
+        }
+    }
+    
+    return diskSize - usedSpace;
+}
+
+int DiskManager::calculatePartitionStart(const std::string& path, int size, char fit, int diskSize) {
+    MBR mbr;
+    if (!readMBR(path, mbr)) {
+        return -1;
+    }
+    
+    if (fit == 'F') {  // First Fit
+        int currentPos = sizeof(MBR);
+        for (int i = 0; i < 4; i++) {
+            if (mbr.mbr_partitions[i].part_type != 'N') {
+                currentPos = mbr.mbr_partitions[i].part_start + mbr.mbr_partitions[i].part_s;
+            }
+        }
+        if (currentPos + size <= diskSize) {
+            return currentPos;
+        }
+        return -1;  // No hay espacio
+    }
+    
+    // Best Fit y Worst Fit: buscar mejor/peor hueco
+    int bestStart = -1, bestSize = diskSize;
+    int worstStart = -1, worstSize = 0;
+    
+    int currentPos = sizeof(MBR);
+    for (int i = 0; i < 4; i++) {
+        if (mbr.mbr_partitions[i].part_type != 'N') {
+            int gapSize = mbr.mbr_partitions[i].part_start - currentPos;
+            if (gapSize >= size) {
+                if (fit == 'B' && gapSize < bestSize) {  // Best Fit
+                    bestStart = currentPos;
+                    bestSize = gapSize;
+                } else if (fit == 'W' && gapSize > worstSize) {  // Worst Fit
+                    worstStart = currentPos;
+                    worstSize = gapSize;
+                }
+            }
+            currentPos = mbr.mbr_partitions[i].part_start + mbr.mbr_partitions[i].part_s;
+        }
+    }
+    
+    // Último espacio
+    int gapSize = diskSize - currentPos;
+    if (gapSize >= size) {
+        if (fit == 'B' && gapSize < bestSize) {
+            bestStart = currentPos;
+            bestSize = gapSize;
+        } else if (fit == 'W' && gapSize > worstSize) {
+            worstStart = currentPos;
+            worstSize = gapSize;
+        }
+    }
+    
+    return (fit == 'B') ? bestStart : worstStart;
+}
