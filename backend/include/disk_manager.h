@@ -44,6 +44,26 @@ public:
     
     // Calcula donde colocar una partición (Best Fit, First Fit, Worst Fit)
     static int calculatePartitionStart(const std::string& path, int size, char fit, int diskSize);
+    
+    // Superblock operations
+    static bool readSuperblock(const std::string& path, int partStart, Superblock& sb);
+    static bool writeSuperblock(const std::string& path, int partStart, const Superblock& sb);
+    
+    // Inode operations
+    static bool readInodo(const std::string& path, int partStart, int inodeNum, Inodo& ino);
+    static bool writeInodo(const std::string& path, int partStart, int inodeNum, const Inodo& ino);
+    static int allocateInode(const std::string& path, int partStart, Superblock& sb);
+    static bool deallocateInode(const std::string& path, int partStart, int inodeNum, Superblock& sb);
+    
+    // Block operations
+    static bool readBlock(const std::string& path, int partStart, int blockNum, char* buffer, int size);
+    static bool writeBlock(const std::string& path, int partStart, int blockNum, const char* buffer, int size);
+    static int allocateBlock(const std::string& path, int partStart, Superblock& sb);
+    static bool deallocateBlock(const std::string& path, int partStart, int blockNum, Superblock& sb);
+    
+    // Bitmap operations
+    static bool getBitmapBit(const std::string& path, int bitmapStart, int bitNum);
+    static bool setBitmapBit(const std::string& path, int bitmapStart, int bitNum, bool value);
 };
 
 #endif // DISK_MANAGER_H

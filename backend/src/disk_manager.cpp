@@ -260,3 +260,104 @@ int DiskManager::calculatePartitionStart(const std::string& path, int size, char
     
     return (fit == 'B') ? bestStart : worstStart;
 }
+
+bool DiskManager::readSuperblock(const std::string& path, int partStart, Superblock& sb) {
+    return readFromDisk(path, partStart, (char*)&sb, sizeof(Superblock));
+}
+
+bool DiskManager::writeSuperblock(const std::string& path, int partStart, const Superblock& sb) {
+    return writeToDisk(path, partStart, (char*)&sb, sizeof(Superblock));
+}
+
+bool DiskManager::readInodo(const std::string& path, int partStart, int inodeNum, Inodo& ino) {
+    Superblock sb;
+    if (!readSuperblock(path, partStart, sb)) return false;
+    int offset = sb.s_inode_start + (inodeNum * sizeof(Inodo));
+    return readFromDisk(path, offset, (char*)&ino, sizeof(Inodo));
+}
+
+bool DiskManager::writeInodo(const std::string& path, int partStart, int inodeNum, const Inodo& ino) {
+    Superblock sb;
+    if (!readSuperblock(path, partStart, sb)) return false;
+    int offset = sb.s_inode_start + (inodeNum * sizeof(Inodo));
+    return writeToDisk(path, offset, (char*)&ino, sizeof(Inodo));
+}
+
+int DiskManager::allocateInode(const std::string& path, int partStart, Superblock& sb) {
+    if (sb.s_free_inodes_count <= 0) return -1;
+    
+    for (int i = 0; i < sb.s_inodes_count; i++) {
+        if (!getBitmapBit(path, sb.s_bm_inode_start, i)) {
+            setBitmapBit(path, sb.s_bm_inode_start, i, true);
+            sb.s_free_inodes_count--;
+            writeSuperblock(path, partStart, sb);
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool DiskManager::deallocateInode(const std::string& path, int partStart, int inodeNum, Superblock& sb) {
+    if (inodeNum < 0 || inodeNum >= sb.s_inodes_count) return false;
+    if (!setBitmapBit(path, sb.s_bm_inode_start, inodeNum, false)) return false;
+    sb.s_free_inodes_count++;
+    return writeSuperblock(path, partStart, sb);
+}
+
+bool DiskManager::readBlock(const std::string& path, int partStart, int blockNum, char* buffer, int size) {
+    Superblock sb;
+    if (!readSuperblock(path, partStart, sb)) return false;
+    int offset = sb.s_block_start + (blockNum * sb.s_block_s);
+    return readFromDisk(path, offset, buffer, size);
+}
+
+bool DiskManager::writeBlock(const std::string& path, int partStart, int blockNum, const char* buffer, int size) {
+    Superblock sb;
+    if (!readSuperblock(path, partStart, sb)) return false;
+    int offset = sb.s_block_start + (blockNum * sb.s_block_s);
+    return writeToDisk(path, offset, buffer, size);
+}
+
+int DiskManager::allocateBlock(const std::string& path, int partStart, Superblock& sb) {
+    if (sb.s_free_blocks_count <= 0) return -1;
+    
+    for (int i = 0; i < sb.s_blocks_count; i++) {
+        if (!getBitmapBit(path, sb.s_bm_block_start, i)) {
+            setBitmapBit(path, sb.s_bm_block_start, i, true);
+            sb.s_free_blocks_count--;
+            writeSuperblock(path, partStart, sb);
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool DiskManager::deallocateBlock(const std::string& path, int partStart, int blockNum, Superblock& sb) {
+    if (blockNum < 0 || blockNum >= sb.s_blocks_count) return false;
+    if (!setBitmapBit(path, sb.s_bm_block_start, blockNum, false)) return false;
+    sb.s_free_blocks_count++;
+    return writeSuperblock(path, partStart, sb);
+}
+
+bool DiskManager::getBitmapBit(const std::string& path, int bitmapStart, int bitNum) {
+    int bytePos = bitNum / 8;
+    int bitPos = bitNum % 8;
+    unsigned char byte;
+    if (!readFromDisk(path, bitmapStart + bytePos, (char*)&byte, 1)) return false;
+    return (byte & (1 << bitPos)) != 0;
+}
+
+bool DiskManager::setBitmapBit(const std::string& path, int bitmapStart, int bitNum, bool value) {
+    int bytePos = bitNum / 8;
+    int bitPos = bitNum % 8;
+    unsigned char byte;
+    if (!readFromDisk(path, bitmapStart + bytePos, (char*)&byte, 1)) return false;
+    
+    if (value) {
+        byte |= (1 << bitPos);
+    } else {
+        byte &= ~(1 << bitPos);
+    }
+    
+    return writeToDisk(path, bitmapStart + bytePos, (char*)&byte, 1);
+}
