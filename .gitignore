@@ -1,34 +1,58 @@
 # Build artifacts
-/backend/build/
+/build/
 /backend/bin/
 /backend/obj/
 *.o
 *.a
 *.so
 *.exe
+*.out
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
 
-# IDE
+# IDE & Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+*.sublime-workspace
+*.sublime-project
 .DS_Store
 
-# Discos de prueba
+# Sistema de Archivos
 *.mia
+*.dsk
+*.disk
 
 # Frontend
-/frontend/node_modules/
-/frontend/dist/
-/frontend/build/
+/Frontend/node_modules/
+/Frontend/dist/
+/Frontend/build/
 
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
+*.egg
 
-# Logs
+# Logs & Temp
 *.log
+*.tmp
+*.bak
+
+# Reportes generados
+/reports/
+*.pdf
+*.jpg
+*.png
+*.dot
+*.txt
+
+# Ejecutables compilados
+extremsfs
+extremsfs_lib.a
 

@@ -14,6 +14,10 @@ private:
     std::string currentPartitionId;
     bool isLoggedIn;
     std::map<std::string, std::string> mountedPartitions;  // ID -> ruta del disco
+    std::map<std::string, int> diskMountStates;  // ruta del disco -> número de montaje
+    std::map<std::string, char> diskLetterStates;  // ruta del disco -> letra actual (A-D)
+    std::map<std::string, std::string> groups;  // groupName -> groupId
+    std::map<std::string, std::string> users;   // userName -> password:groupName
 
 public:
     CommandHandler();
@@ -54,6 +58,34 @@ private:
     
     // Reportes
     std::string cmdRep(const std::map<std::string, std::string>& params);
+    
+    // Funciones helper para filesystem
+    struct PathNode {
+        std::string fileName;
+        int inodeNum;
+        char type;  
+    };
+    
+    // Obtiene un inodo por número
+    bool getInodeFromNum(const std::string& diskPath, int partStart, int inodeNum, Inodo& ino);
+    
+    // Busca un archivo/carpeta por nombre en un directorio
+    int findInodeInDirectory(const std::string& diskPath, int partStart, int parentInode, 
+                            const std::string& name, Inodo& parentIno);
+    
+    // Obtiene el inodo de una ruta completa (ej: /home/user/file.txt)
+    int getInodeFromPath(const std::string& diskPath, int partStart, const std::string& path,
+                        Inodo& resultIno, char& type);
+    
+    // Crea recursivamente las carpetas padres de una ruta
+    bool createParentDirs(const std::string& diskPath, int partStart, int superblockStart,
+                         const std::string& path);
+    
+    // Valida si el usuario tiene permiso de lectura
+    bool hasReadPermission(const Inodo& ino, const std::string& userName);
+    
+    // Valida si el usuario tiene permiso de escritura
+    bool hasWritePermission(const Inodo& ino, const std::string& userName);
     
     // Valida parámetros obligatorios
     std::string validateMandatoryParams(const std::map<std::string, std::string>& params,
